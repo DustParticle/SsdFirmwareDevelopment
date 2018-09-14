@@ -1,0 +1,7 @@
+.vs/
+gTest/x64
+gTest/gTest.vcxproj.user
+SsdSim/SsdSim.vcxproj.user
+SsdSim/x64
+x64/
+packages/
