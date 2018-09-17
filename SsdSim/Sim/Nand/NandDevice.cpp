@@ -9,12 +9,6 @@ NandDevice::NandDevice(U32 blockCount, U32 pagesPerBlock, U32 bytesPerPage)
 	}
 }
 
-NandDevice::NandDevice(NandDevice&& rhs)
-{
-	_Desc = std::move(rhs._Desc);
-	_Blocks = std::move(rhs._Blocks);
-}
-
 void NandDevice::ReadPage(tBlockInChip block, tPageInBlock page, U8* const pOutData)
 {
 	_Blocks[block._].ReadPage(page, pOutData);

@@ -14,15 +14,6 @@ NandBlock::NandBlock(U32 pagesPerBlock, U32 totalBytesPerPage)
 	}
 }
 
-NandBlock::NandBlock(NandBlock&& rhs)
-{
-	_Buffer = std::move(rhs._Buffer);
-	_ErasedBuffer = std::move(rhs._ErasedBuffer);
-
-	_PagesPerBlock = rhs._PagesPerBlock;
-	_TotalBytesPerPage = rhs._TotalBytesPerPage;
-}
-
 void NandBlock::Erase()
 {
 	_Buffer.reset();

@@ -11,8 +11,7 @@ class NandDevice
 {
 public:
 	NandDevice(U32 blockCount, U32 pagesPerBlock, U32 bytesPerPage);
-
-	NandDevice(NandDevice&& rhs);
+	NandDevice(NandDevice&& rhs) = default;
 
 public:
 	void ReadPage(tBlockInChip block, tPageInBlock page, U8* const pOutData);

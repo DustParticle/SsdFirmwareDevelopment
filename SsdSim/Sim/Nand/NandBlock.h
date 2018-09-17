@@ -10,7 +10,7 @@ class NandBlock
 {
 public:
 	NandBlock(U32 pagesPerBlock, U32 totalBytesPerPage);
-	NandBlock(NandBlock&& rhs);
+	NandBlock(NandBlock&& rhs) = default;
 
 public:
 	void Erase();
