@@ -1,10 +1,12 @@
 #include "pch.h"
 
+#include <future>
+
 #include "Nand/NandDevice.h"
 #include "Nand/NandHal.h"
 
 TEST(NandDeviceTest, Basic) {
-	constexpr U32 blockCount = 2;
+	constexpr U32 blockCount = 64;
 	constexpr U32 pagesPerBlock = 256;
 	constexpr U32 bytesPerPage = 8192;
 
@@ -16,6 +18,8 @@ TEST(NandDeviceTest, Basic) {
 		pDataToWrite[i] = i % 255;
 	}
 	U8 pDataRead[bytesPerPage];
+	U8 pErasedBuffer[bytesPerPage];
+	std::memset(pErasedBuffer, NandBlock::ERASED_PATTERN, sizeof(pErasedBuffer));
 
 	tBlockInChip block;
 	block._ = 0;
@@ -26,30 +30,26 @@ TEST(NandDeviceTest, Basic) {
 		for (; page._ < pagesPerBlock; ++page._)
 		{
 			nandDevice.WritePage(block, page, pDataToWrite);
-
+			
 			nandDevice.ReadPage(block, page, pDataRead);
-			for (auto i(0); i < bytesPerPage; ++i)
-			{
-				ASSERT_EQ(pDataToWrite[i], pDataRead[i]);
-			}
+			auto result = std::memcmp(pDataToWrite, pDataRead, bytesPerPage);
+			ASSERT_EQ(0, result);
 		}
 
 		nandDevice.EraseBlock(block);
 		for (; page._ < pagesPerBlock; ++page._)
 		{
 			nandDevice.ReadPage(block, page, pDataRead);
-			for (auto i = 0; i < bytesPerPage; ++i)
-			{
-				ASSERT_EQ(NandBlock::ERASED_PATTERN, pDataRead[i]);
-			}
+			auto result = std::memcmp(pErasedBuffer, pDataRead, bytesPerPage);
+			ASSERT_EQ(0, result);
 		}
 	}
 }
 
 TEST(NandHalTest, Basic) {
 	constexpr U8 chips = 2;
-	constexpr U32 blocks = 4;
-	constexpr U32 pages = 128;
+	constexpr U32 blocks = 64;
+	constexpr U32 pages = 256;
 	constexpr U32 bytes = 8192;
 
 	NandHal nandHal;
@@ -62,6 +62,8 @@ TEST(NandHalTest, Basic) {
 		pDataToWrite[i] = i % 255;
 	}
 	U8 pDataRead[bytes];
+	U8 pErasedBuffer[bytes];
+	std::memset(pErasedBuffer, NandBlock::ERASED_PATTERN, sizeof(pErasedBuffer));
 
 	tChip chip;
 	chip._ = 0;
@@ -78,20 +80,16 @@ TEST(NandHalTest, Basic) {
 				nandHal.WritePage(chip, block, page, pDataToWrite);
 
 				nandHal.ReadPage(chip, block, page, pDataRead);
-				for (auto i(0); i < bytes; ++i)
-				{
-					ASSERT_EQ(pDataToWrite[i], pDataRead[i]);
-				}
+				auto result = std::memcmp(pDataToWrite, pDataRead, bytes);
+				ASSERT_EQ(0, result);
 			}
 
 			nandHal.EraseBlock(chip, block);
 			for (; page._ < pages; ++page._)
 			{
 				nandHal.ReadPage(chip, block, page, pDataRead);
-				for (auto i = 0; i < bytes; ++i)
-				{
-					ASSERT_EQ(NandBlock::ERASED_PATTERN, pDataRead[i]);
-				}
+				auto result = std::memcmp(pErasedBuffer, pDataRead, bytes);
+				ASSERT_EQ(0, result);
 			}
 		}
 	}
